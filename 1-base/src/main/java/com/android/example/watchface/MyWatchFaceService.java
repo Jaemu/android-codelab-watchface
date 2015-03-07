@@ -167,6 +167,7 @@ public class MyWatchFaceService extends CanvasWatchFaceService {
             mSecondHandLength = mCenterX - 20;
         }
 
+        
         @Override
         public void onDraw(Canvas canvas, Rect bounds) {
             mTime.setToNow();
