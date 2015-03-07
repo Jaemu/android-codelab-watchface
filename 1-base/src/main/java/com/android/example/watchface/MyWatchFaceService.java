@@ -45,6 +45,8 @@ public class MyWatchFaceService extends CanvasWatchFaceService {
      * second hand.
      */
     private static final long INTERACTIVE_UPDATE_RATE_MS = TimeUnit.SECONDS.toMillis(1);
+    private static final float HAND_END_CAP_RADIUS = 4f;
+    private static final float SHADOW_RADIUS = 6f;
 
     @Override
     public Engine onCreateEngine() {
@@ -97,6 +99,8 @@ public class MyWatchFaceService extends CanvasWatchFaceService {
         private float mCenterX;
         private float mCenterY;
 
+
+
         @Override
         public void onCreate(SurfaceHolder holder) {
             super.onCreate(holder);
@@ -115,6 +119,9 @@ public class MyWatchFaceService extends CanvasWatchFaceService {
             mHandPaint.setStrokeWidth(STROKE_WIDTH);
             mHandPaint.setAntiAlias(true);
             mHandPaint.setStrokeCap(Paint.Cap.ROUND);
+
+            mHandPaint.setShadowLayer(SHADOW_RADIUS, 0, 0, Color.BLACK);
+            mHandPaint.setStyle(Paint.Style.STROKE);
 
             mTime = new Time();
         }
@@ -162,12 +169,18 @@ public class MyWatchFaceService extends CanvasWatchFaceService {
             /*
              * Calculate the lengths of the watch hands and store them in member variables.
              */
-            mHourHandLength = mCenterX - 80;
-            mMinuteHandLength = mCenterX - 40;
-            mSecondHandLength = mCenterX - 20;
+            mHourHandLength = (float) 0.5 * width / 2;/*mCenterX - 80;*/
+            mMinuteHandLength = (float) 0.7 * width / 2;/*mCenterX - 40;*/
+            mSecondHandLength = (float) 0.9 * width / 2;/*mCenterX - 20;*/
         }
 
-        
+        private void drawHand(Canvas canvas, float handLength) {
+            canvas.drawRoundRect(mCenterX - HAND_END_CAP_RADIUS,
+                    mCenterY - handLength, mCenterX + HAND_END_CAP_RADIUS,
+                    mCenterY + HAND_END_CAP_RADIUS, HAND_END_CAP_RADIUS,
+                    HAND_END_CAP_RADIUS, mHandPaint);
+        }
+
         @Override
         public void onDraw(Canvas canvas, Rect bounds) {
             mTime.setToNow();
@@ -189,16 +202,20 @@ public class MyWatchFaceService extends CanvasWatchFaceService {
             canvas.save();
 
             canvas.rotate(hoursRotation, mCenterX, mCenterY);
-            canvas.drawLine(mCenterX, mCenterY, mCenterX, mCenterY - mHourHandLength, mHandPaint);
+            /*canvas.drawLine(mCenterX, mCenterY, mCenterX, mCenterY - mHourHandLength, mHandPaint);*/
+            drawHand(canvas, mMinuteHandLength);
 
             canvas.rotate(minutesRotation - hoursRotation, mCenterX, mCenterY);
-            canvas.drawLine(mCenterX, mCenterY, mCenterX, mCenterY - mMinuteHandLength, mHandPaint);
+           /* canvas.drawLine(mCenterX, mCenterY, mCenterX, mCenterY - mMinuteHandLength, mHandPaint);*/
+            drawHand(canvas, mHourHandLength);
 
             if (!mAmbient) {
                 canvas.rotate(secondsRotation - minutesRotation, mCenterX, mCenterY);
                 canvas.drawLine(mCenterX, mCenterY, mCenterX, mCenterY - mSecondHandLength,
                         mHandPaint);
             }
+            canvas.drawLine(mCenterX, mCenterY - HAND_END_CAP_RADIUS, mCenterX,
+                    mCenterY - mSecondHandLength, mHandPaint);
             // restore the canvas' original orientation.
             canvas.restore();
         }
