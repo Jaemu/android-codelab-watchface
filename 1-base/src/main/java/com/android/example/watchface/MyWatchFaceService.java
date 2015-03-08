@@ -20,6 +20,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -99,6 +101,7 @@ public class MyWatchFaceService extends CanvasWatchFaceService {
         private float mCenterX;
         private float mCenterY;
 
+        private Bitmap mBackgroundBitmap;
 
 
         @Override
@@ -110,9 +113,12 @@ public class MyWatchFaceService extends CanvasWatchFaceService {
                     .setBackgroundVisibility(WatchFaceStyle.BACKGROUND_VISIBILITY_INTERRUPTIVE)
                     .setShowSystemUiTime(false)
                     .build());
+            final int backgroundResId = R.drawable.custom_background;
 
             mBackgroundPaint = new Paint();
             mBackgroundPaint.setColor(Color.BLACK);
+
+            mBackgroundBitmap = BitmapFactory.decodeResource(getResources(), backgroundResId);
 
             mHandPaint = new Paint();
             mHandPaint.setColor(Color.WHITE);
@@ -186,8 +192,8 @@ public class MyWatchFaceService extends CanvasWatchFaceService {
             mTime.setToNow();
 
             // Draw the background.
-            canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), mBackgroundPaint);
-
+            //canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), mBackgroundPaint);
+            canvas.drawBitmap(mBackgroundBitmap, 0, 0, mBackgroundPaint);
             /*
              * These calculations reflect the rotation in degrees per unit of
              * time, e.g. 360 / 60 = 6 and 360 / 12 = 30
